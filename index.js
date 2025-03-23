@@ -2,6 +2,9 @@ const express = require('express')
 const app = express()
 const port = 3000
 
+//Define a pasta publica
+app.use(express.static("public"));
+
 app.get('/api/movies', (req, res) => {
     const movies = [{
         _id: '123456',
