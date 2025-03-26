@@ -1,6 +1,24 @@
-const express = require('express')
-const app = express()
-const port = 3000
+const express = require('express');
+const { MongoClient } = require('mongodb');
+
+const port = 3000;
+const mongoUrl = 'mongodb://localhost:27017';
+const dbName = 'movies';
+
+const app = express();
+const client = new MongoClient(mongoUrl);
+
+const connectDb = async () => {
+    await client.connect();
+    console.log("Database connected")
+}
+
+const disconnectDb = async () => {
+    await client.close();
+    console.log("Database disconnected")
+}
+
+connectDb();
 
 //Define a pasta publica
 app.use(express.static("public"));
@@ -26,7 +44,7 @@ app.get('/api/movies', (req, res) => {
         synopsis: 'lorem ipsum',
         mpaa: 'PG-13'
     }];
-    res.json(movies)
+    res.json(movies);
 })
 
 app.get('/api/movies/:name', (req, res) => {
@@ -40,7 +58,7 @@ app.get('/api/movies/:name', (req, res) => {
         synopsis: 'lorem ipsum',
         mpaa: 'PG-13'
     };
-    res.json(movie)
+    res.json(movie);
 })
 
 app.post('/api/movies', (req, res) => {
