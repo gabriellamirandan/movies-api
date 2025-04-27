@@ -29,42 +29,67 @@ app.use(express.static("public"));
 //Middleware que converte o body da requisicao em objeto js e para disponibiliza-lo na req.body
 app.use(express.json());
 
-app.get('/api/movies', (req, res) => {
-    const movies = [{
-        _id: '123456',
-        name: 'Ainda Estou Aqui',
-        year: 2024,
-        directors: ['Walter Salles'],
-        cast: ['Fernanda Torres', 'Fernanda Montenegro', 'Selton Mello'],
-        country: 'Brazil',
-        synopsis: 'lorem ipsum',
-        mpaa: 'PG-13'
-    },
-    {
-        _id: '123456',
-        name: 'Ainda Estou Aqui',
-        year: 2024,
-        directors: ['Walter Salles'],
-        cast: ['Fernanda Torres', 'Fernanda Montenegro', 'Selton Mello'],
-        country: 'Brazil',
-        synopsis: 'lorem ipsum',
-        mpaa: 'PG-13'
-    }];
-    res.json(movies);
+app.get('/api/movies', async (req, res) => {
+    // TODO pegar todos os filmes pelo nome usando GET
+    //pegar o banco de dados e a collection movies dentro do banco
+    const database = client.db(dbName);
+    const collection = database.collection(collectionName);
+
+    //usar o find() para buscar todos os filmes
+    const moviesList = await collection.find({}).toArray();
+
+    console.log(moviesList);
+    res.status(200);
+    res.json(moviesList);
+
+    //retornar o resultado
+    /*if (moviesList.length) {
+        res.status(200);
+        res.json(moviesList);
+    } else {
+        res.sendStatus(404);
+    };*/
 })
 
-app.get('/api/movies/:name', (req, res) => {
-    const movie = {
-        _id: '123456',
-        name: 'Ainda Estou Aqui',
-        year: 2024,
-        directors: ['Walter Salles'],
-        cast: ['Fernanda Torres', 'Fernanda Montenegro', 'Selton Mello'],
-        country: 'Brazil',
-        synopsis: 'lorem ipsum',
-        mpaa: 'PG-13'
-    };
-    res.json(movie);
+app.get('/api/movies/name/:name', async (req, res) => {
+    // TODO pegar o filme pelo nome usando GET
+    //pegar o banco de dados e a collection movies dentro do banco
+    const database = client.db(dbName);
+    const collection = database.collection(collectionName);
+
+    //buscar filme pelo nome usando findOne
+    const resultMovie = await collection.findOne({ name: req.params.name });
+
+    //testar o resultado
+    console.log(resultMovie);
+
+    //responder o pedido. Se null, nao achou o filme. Se achou, retorna o objeto.
+    if (resultMovie) {
+        //res.status(200); (nao precisa, json ja manda 200)
+        res.json(resultMovie);
+    } else {
+        res.sendStatus(404);
+    }
+})
+
+app.delete('/api/movies/name/:name', async (req, res) => {
+    // TODO deletar o filme pelo nome usando DELETE
+    //pegar o banco de dados e a collection movies dentro do banco
+    const database = client.db(dbName);
+    const collection = database.collection(collectionName);
+
+    //deletar filme pelo nome usando deleteOne
+    const deletedMovie = await collection.deleteOne({ name: req.params.name });
+
+    //testar o resultado
+    console.log(deletedMovie);
+
+    //responder o pedido de acordo com o numero de filmes deletados. Se nao deletou, 404 para nao encontrado. Se deletou, retorna que funcionou mas nao tem resposta.
+    if (deletedMovie.deletedCount) {
+        res.sendStatus(204); 
+    } else {
+        res.sendStatus(404);
+    }
 })
 
 app.post('/api/movies', async (req, res) => {
@@ -104,5 +129,5 @@ app.post('/api/movies', async (req, res) => {
 app.listen(port, () => {
     console.log(`App de exemplo esta rodando na porta ${port}`)
 })
-
+//olhar metodo do mongo updateone para atualizacao. Primeiro parametro vai ser a query, segundo o que e como sera atualizado. Vamos usar o SET.
 // https://pt.wikipedia.org/wiki/REST
