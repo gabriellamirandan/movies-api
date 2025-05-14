@@ -86,7 +86,7 @@ app.delete('/api/movies/name/:name', async (req, res) => {
 
     //responder o pedido de acordo com o numero de filmes deletados. Se nao deletou, 404 para nao encontrado. Se deletou, retorna que funcionou mas nao tem resposta.
     if (deletedMovie.deletedCount) {
-        res.sendStatus(204); 
+        res.sendStatus(204);
     } else {
         res.sendStatus(404);
     }
@@ -124,10 +124,37 @@ app.post('/api/movies', async (req, res) => {
         console.log('Inserted documents =>', insertedMovie);
         return res.sendStatus(201);
     }
+});
+
+app.put('/api/movies/name/:name', async (req, res) => {
+    console.log("put na api movies");
+    console.log(req.body);
+    const database = client.db(dbName);
+    const collection = database.collection(collectionName);
+
+    const result = await collection.updateOne({
+        name: req.params.name
+    },
+        {
+            $set: { 
+                year: req.body.year,
+                directors: req.body.directors,
+                cast: req.body.cast,
+                country: req.body.country,
+                synopsis: req.body.synopsis,
+                mpaa: req.body.mpaa            }
+        });
+
+    console.log(result);
+
+    if (result.matchedCount === 0) {
+        return res.sendStatus(404);
+    }
+    res.sendStatus(204);
 })
 
 app.listen(port, () => {
     console.log(`App de exemplo esta rodando na porta ${port}`)
-})
+});
 //olhar metodo do mongo updateone para atualizacao. Primeiro parametro vai ser a query, segundo o que e como sera atualizado. Vamos usar o SET.
 // https://pt.wikipedia.org/wiki/REST
