@@ -127,23 +127,22 @@ app.post('/api/movies', async (req, res) => {
 });
 
 app.put('/api/movies/name/:name', async (req, res) => {
-    console.log("put na api movies");
-    console.log(req.body);
     const database = client.db(dbName);
     const collection = database.collection(collectionName);
 
     const result = await collection.updateOne({
         name: req.params.name
     },
-        {
-            $set: { 
-                year: req.body.year,
-                directors: req.body.directors,
-                cast: req.body.cast,
-                country: req.body.country,
-                synopsis: req.body.synopsis,
-                mpaa: req.body.mpaa            }
-        });
+    {
+        $set: {
+            year: req.body.year,
+            directors: req.body.directors,
+            cast: req.body.cast,
+            country: req.body.country,
+            synopsis: req.body.synopsis,
+            mpaa: req.body.mpaa
+        }
+    });
 
     console.log(result);
 
@@ -151,7 +150,7 @@ app.put('/api/movies/name/:name', async (req, res) => {
         return res.sendStatus(404);
     }
     res.sendStatus(204);
-})
+});
 
 app.listen(port, () => {
     console.log(`App de exemplo esta rodando na porta ${port}`)
